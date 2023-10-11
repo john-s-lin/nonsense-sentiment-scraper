@@ -4,14 +4,15 @@ import os
 import re
 import sys
 
-logging.basicConfig(stream=sys.stdout, level=logging.INFO)
-
 from clustering.clustering import TextClusterer
 from scrapy.crawler import CrawlerProcess
 from scraper.gc_spider import GinaCodySpider, OVERRIDE_SETTINGS
 from scraper.extractor import TextExtractor, RAW_TEXT_OUTPUT_FILE
 from sentiment.sentiment_analysis import SentimentAnalyzer
 from utils.utils import create_output_directory, OUTPUT_DIRECTORY
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+
 
 VISITED_URLS_OUTPUT_FILE = "./output/urls.json"
 N_CLUSTERS = os.getenv("CLUSTERS", "3")
@@ -57,7 +58,7 @@ def cluster(n_clusters: int) -> None:
     raw = clusterer.get_raw_text(RAW_TEXT_OUTPUT_FILE)
     tf_idf_vectors = clusterer.vectorize_text(raw)
     lsa_tfidf = clusterer.reduce_dimensions(tf_idf_vectors)
-    k_means = clusterer.generate_kmeans(lsa_tfidf)
+    clusterer.generate_kmeans(lsa_tfidf)
     clusterer.generate_stats(f"./output/kmeans_{n_clusters}_clusters.json")
     labeled_docs = clusterer.classify_documents_by_cluster(raw)
     clusterer.save_to_output_file(
@@ -83,7 +84,7 @@ def sentiment() -> None:
         Returns:
             str: n_clusters
         """
-        return re.findall("\d+", filename)[0]
+        return re.findall(r"\d+", filename)[0]
 
     for filename in sorted(labeled_json_list):
         n_clusters = _get_n_clusters_from_filename(filename)
@@ -107,7 +108,6 @@ def raise_argument_error():
 
 
 def main():
-
     args = sys.argv[1:]
 
     if len(args) > 0:
