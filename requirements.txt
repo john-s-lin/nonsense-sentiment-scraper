@@ -1,6 +1,6 @@
 afinn==0.1
 beautifulsoup4==4.11.1
-numpy==1.23.4
+numpy==1.26.0
 requests==2.31.0
 scikit_learn==1.2.0
 scipy==1.9.3
