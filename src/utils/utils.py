@@ -28,6 +28,15 @@ def get_user_input_starting_url() -> str:
 
 
 def get_user_input_crawl_limit() -> int:
+    """Sanitize raw input to crawl limit as INT
+
+    Raises:
+        ValueError: INT must be between 1 and 10000
+        ValueError: Input must be a positive INT
+
+    Returns:
+        int: crawl limit
+    """
     raw_input = input("Set the number of pages to crawl (1-10000): ")
 
     if raw_input.isdigit():
