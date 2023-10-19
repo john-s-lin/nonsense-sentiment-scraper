@@ -45,7 +45,10 @@ class TextExtractor:
             logging.info(f"Extracting text from: {url}")
             request = requests.get(url=url)
             soup = BeautifulSoup(request.text, "lxml")
-            title = soup.find("title").text
+
+            title_exists = soup.find("title")
+            title = title_exists.text if title_exists else ""
+
             body_list = self._clean_body(soup)
             body_str = " ".join(body_list)
             full_page = title + " " + body_str
