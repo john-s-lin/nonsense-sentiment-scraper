@@ -1,8 +1,8 @@
+import logging
 import os
 
 from scrapy.http.response.html import HtmlResponse
 from scrapy.exceptions import CloseSpider
-from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 
 CRAWL_LIMIT = os.getenv("CRAWL_LIMIT", 100)
@@ -15,24 +15,22 @@ OVERRIDE_SETTINGS = {
 }
 
 
-class GinaCodySpider(CrawlSpider):
-    name = "ginacody"
-    start_urls = ["https://www.concordia.ca/ginacody.html/"]
+class ModifiedSpider(CrawlSpider):
+    name = "general"
+    start_urls = []
     visited_urls = set()
-    rules = [
-        Rule(
-            LinkExtractor(
-                allow="ginacody",
-                deny=(
-                    r"^(?!https://www.concordia.ca).+",
-                    r"(https://www.concordia.ca/fr).+",
-                ),
-            ),
-            callback="parse_item",
-            follow=True,
-        )
-    ]
+    rules = [Rule(callback="parse_item", follow=True)]
     crawl_limit = int(CRAWL_LIMIT)
+
+    @classmethod
+    def set_start_urls(cls, url: str) -> None:
+        logging.info(f"Setting start url to: {url}")
+        cls.start_urls.append(url)
+
+    @classmethod
+    def set_crawl_limit(cls, limit: int) -> None:
+        logging.info(f"Setting crawl limit to: {limit}")
+        cls.crawl_limit = limit
 
     def parse_item(self, response: HtmlResponse) -> None:
         """Parse urls and stores in a set
@@ -63,7 +61,8 @@ class GinaCodySpider(CrawlSpider):
             "//meta[@name='robots']/@content"
         ).extract_first()
         if meta_robots_tag_content and (
-            "noindex" in meta_robots_tag_content or "nofollow" in meta_robots_tag_content
+            "noindex" in meta_robots_tag_content
+            or "nofollow" in meta_robots_tag_content
         ):
             return False
         return True

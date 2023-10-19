@@ -6,10 +6,15 @@ import sys
 
 from clustering.clustering import TextClusterer
 from scrapy.crawler import CrawlerProcess
-from scraper.gc_spider import GinaCodySpider, OVERRIDE_SETTINGS
+from scraper.spider import ModifiedSpider, OVERRIDE_SETTINGS
 from scraper.extractor import TextExtractor, RAW_TEXT_OUTPUT_FILE
 from sentiment.sentiment_analysis import SentimentAnalyzer
-from utils.utils import create_output_directory, OUTPUT_DIRECTORY
+from utils.utils import (
+    create_output_directory,
+    get_user_input_starting_url,
+    get_user_input_crawl_limit,
+    OUTPUT_DIRECTORY,
+)
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
@@ -21,8 +26,15 @@ N_CLUSTERS = os.getenv("CLUSTERS", "3")
 def crawler() -> None:
     """Crawls using GinaCodySpider and stores visited URLS in json format"""
     process = CrawlerProcess(settings=OVERRIDE_SETTINGS)
-    ginacody_spider = GinaCodySpider
-    process.crawl(ginacody_spider)
+    spider = ModifiedSpider
+
+    start_url = get_user_input_starting_url()
+    spider.set_start_urls(start_url)
+
+    crawl_limit = get_user_input_crawl_limit()
+    spider.set_crawl_limit(crawl_limit)
+
+    process.crawl(spider)
     process.start()
 
     def store_visited_urls(visited_urls: set) -> None:
@@ -37,7 +49,7 @@ def crawler() -> None:
             file.write(output_json)
             logging.info(f"URLs written to {VISITED_URLS_OUTPUT_FILE}.")
 
-    store_visited_urls(ginacody_spider.visited_urls)
+    store_visited_urls(spider.visited_urls)
 
 
 def extract() -> None:
