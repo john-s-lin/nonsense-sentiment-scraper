@@ -3,6 +3,7 @@ import os
 
 from scrapy.http.response.html import HtmlResponse
 from scrapy.exceptions import CloseSpider
+from scrapy.linkextractors import LinkExtractor
 from scrapy.spiders import CrawlSpider, Rule
 
 CRAWL_LIMIT = os.getenv("CRAWL_LIMIT", 100)
@@ -19,7 +20,15 @@ class ModifiedSpider(CrawlSpider):
     name = "general"
     start_urls = []
     visited_urls = set()
-    rules = [Rule(callback="parse_item", follow=True)]
+    rules = [
+        Rule(
+            LinkExtractor(
+                deny=(r".*login.microsoftonline.com.*", r".*exchange.mcgill.ca.*")
+            ),
+            callback="parse_item",
+            follow=True,
+        )
+    ]
     crawl_limit = int(CRAWL_LIMIT)
 
     @classmethod
