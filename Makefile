@@ -1,3 +1,13 @@
+ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+IMAGE_NAME := "nonsense-sentiment-scraper"
+TAG := "0.1"
+
+build:
+	docker build -t $(IMAGE_NAME):$(TAG) $(ROOT_DIR)
+
+run-container:
+	bash run_container.sh
+
 all:
 	make scraper CRAWL_LIMIT=100
 	make extract

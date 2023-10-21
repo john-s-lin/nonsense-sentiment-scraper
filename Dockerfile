@@ -18,4 +18,4 @@ WORKDIR /app
 SHELL ["conda", "run", "-n", "nss", "/bin/bash", "-c"]
 RUN pip install -r requirements.txt
 
-# No ENTRYPOINT or CMD since you'll have to enter the container to run make commands
+ENTRYPOINT ["/bin/bash"]
