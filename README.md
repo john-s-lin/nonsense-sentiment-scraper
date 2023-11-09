@@ -4,6 +4,26 @@
 
 This README contains instructions on how to run the pipeline from start to finish.
 
+### Running inside a Docker container
+
+You can build the image from the `Dockerfile` with `make build`.
+
+Then to run the container, you can `make run-container`, which will start a container and enter into the container's bash terminal.
+
+To get a list of available `conda` environments, run
+
+```
+conda env list
+```
+
+Then switch to the target conda environment `nss` with
+
+```
+conda activate nss
+```
+
+Then you can run the options below. Alternatively, you can run this bare metal, but you will have to ensure that the dependencies are installed.
+
 ### Running the whole project
 
 The whole project can be run in one command:
